@@ -1,0 +1,3 @@
+App/trained_model.pth
+model_repository/cultikure_vgg/1/model.onnx
+model_repository/cultikure_vgg/1/model.onnx.data

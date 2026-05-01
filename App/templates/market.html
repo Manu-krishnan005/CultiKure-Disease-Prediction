@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block pagetitle %}Supplement Market{% endblock %}
+{% block body %}
+<style>
+.market-page { padding: 4rem 0 5rem; min-height: calc(100vh - 64px); background: var(--gradient-hero); }
+.market-header { text-align: center; margin-bottom: 3rem; }
+.market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
+.product-card {
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 40px rgba(0,0,0,.5);
+  border-color: rgba(74,222,128,.3);
+}
+.product-img-wrap { overflow: hidden; height: 200px; background: rgba(255,255,255,.04); }
+.product-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.product-card:hover .product-img-wrap img { transform: scale(1.05); }
+.product-body { padding: 1.25rem; flex: 1; display: flex; flex-direction: column; gap: .5rem; }
+.product-disease { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--color-primary); font-weight: 700; }
+.product-name { font-size: .95rem; font-weight: 600; color: #fff; line-height: 1.4; flex: 1; }
+.product-action { margin-top: .75rem; }
+.search-wrap { max-width: 480px; margin: 0 auto 2.5rem; position: relative; }
+.search-wrap input {
+  width: 100%; padding: .75rem 1.25rem .75rem 3rem;
+  background: var(--color-glass); border: 1px solid var(--color-glass-border);
+  border-radius: var(--radius-pill); color: #fff; font-family: var(--font); font-size: .9rem;
+  outline: none; transition: border-color var(--transition);
+}
+.search-wrap input:focus { border-color: var(--color-primary); }
+.search-wrap input::placeholder { color: var(--color-text-muted); }
+.search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); pointer-events: none; }
+.empty-state { text-align: center; padding: 4rem 1rem; color: var(--color-text-muted); }
+.empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+</style>
+
+<section class="market-page">
+  <div class="container">
+    <div class="market-header fade-in-up">
+      <div class="section-label">Supplement Market</div>
+      <h1 class="section-title">Disease <span>Treatments</span></h1>
+      <div class="divider" style="margin:1rem auto;"></div>
+      <p class="section-body" style="margin:0 auto;text-align:center;">
+        Browse disease-specific fertilizers and treatment supplements.
+      </p>
+    </div>
+
+    <div class="search-wrap fade-in-up delay-1">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input type="text" id="searchInput" placeholder="Search by disease or supplement name..." autocomplete="off">
+    </div>
+
+    <div class="market-grid" id="productGrid">
+      {% for i in range(supplement_image|length) %}
+      <div class="product-card" data-disease="{{ disease[i]|lower }}" data-name="{{ supplement_name[i]|lower }}">
+        <div class="product-img-wrap">
+          <img src="{{ supplement_image[i] }}" alt="{{ supplement_name[i] }}" loading="lazy">
+        </div>
+        <div class="product-body">
+          <div class="product-disease">{{ disease[i] | replace('___', ' — ') | replace('_', ' ') }}</div>
+          <div class="product-name">{{ supplement_name[i] }}</div>
+          <div class="product-action">
+            <a href="{{ buy[i] }}" target="_blank" rel="noopener" class="btn btn-accent" style="width:100%;justify-content:center;">
+              <i class="fa-solid fa-cart-shopping"></i> Buy Now
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="icon">🔍</div>
+      <div>No supplements found matching your search.</div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+{% block scripts %}
+<script>
+const searchInput = document.getElementById('searchInput');
+const cards = document.querySelectorAll('.product-card');
+const emptyState = document.getElementById('emptyState');
+
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.toLowerCase();
+  let visible = 0;
+  cards.forEach(card => {
+    const match = card.dataset.disease.includes(q) || card.dataset.name.includes(q);
+    card.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  emptyState.style.display = visible === 0 ? 'block' : 'none';
+});
+</script>
+{% endblock %}

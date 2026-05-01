@@ -1,0 +1,58 @@
+name: "cultikure_vgg"
+backend: "onnxruntime"
+
+# Maximum batch size for inference
+max_batch_size: 8
+
+# Input tensor: (batch, channels, height, width) — batch dim handled by max_batch_size
+input [
+  {
+    name: "input"
+    data_type: TYPE_FP32
+    dims: [ 3, 224, 224 ]
+  }
+]
+
+# Output tensor: (batch, num_classes)
+output [
+  {
+    name: "output"
+    data_type: TYPE_FP32
+    dims: [ 39 ]
+  }
+]
+
+# GPU execution with CUDA Execution Provider
+instance_group [
+  {
+    count: 1
+    kind: KIND_GPU
+    gpus: [ 0 ]
+  }
+]
+
+# ONNX Runtime optimization settings
+optimization {
+  execution_accelerators {
+    gpu_execution_accelerator [
+      {
+        name: "cuda"
+        parameters {
+          key: "cudnn_conv_algo_search"
+          value: "DEFAULT"
+        }
+        parameters {
+          key: "do_copy_in_default_stream"
+          value: "1"
+        }
+      }
+    ]
+  }
+  graph { level: 1 }
+}
+
+# Dynamic batching: accumulate requests for up to 100 microseconds
+dynamic_batching {
+  preferred_batch_size: [ 1, 4, 8 ]
+  max_queue_delay_microseconds: 100
+}

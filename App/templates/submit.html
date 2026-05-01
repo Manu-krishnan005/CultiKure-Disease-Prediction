@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% block pagetitle %}{{ title }}{% endblock %}
+{% block body %}
+<style>
+.results-page { padding: 3rem 0 5rem; min-height: calc(100vh - 64px); background: var(--gradient-hero); }
+.results-header { text-align: center; margin-bottom: 2.5rem; }
+.results-header h1 { font-size: clamp(1.6rem, 3vw, 2.5rem); font-weight: 800; color: #fff; }
+.results-header h1 span { background: var(--gradient-green); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.results-grid { display: grid; grid-template-columns: 340px 1fr; gap: 2rem; align-items: start; }
+.sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+.sidebar-img-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: var(--radius-card); overflow: hidden; }
+.sidebar-img-card img { width: 100%; object-fit: cover; max-height: 260px; }
+.sidebar-img-body { padding: 1rem; }
+.confidence-section { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: var(--radius-card); padding: 1.25rem; text-align: center; }
+.conf-label { font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--color-text-muted); margin-bottom: .75rem; }
+.conf-value { font-size: 3rem; font-weight: 800; color: var(--color-primary); line-height: 1; }
+.conf-pct { font-size: 1rem; }
+.conf-bar-wrap { margin-top: .75rem; }
+.backend-badge { margin-top: .75rem; }
+.content-col { display: flex; flex-direction: column; gap: 1.5rem; }
+.info-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: var(--radius-card); padding: 1.5rem; }
+.info-card h3 { display: flex; align-items: center; gap: .6rem; font-size: .95rem; font-weight: 700; color: var(--color-primary); margin-bottom: .85rem; }
+.info-card p { font-size: .9rem; color: var(--color-text-muted); line-height: 1.7; }
+.steps-list { list-style: none; counter-reset: steps; }
+.steps-list li { counter-increment: steps; display: flex; gap: .75rem; align-items: flex-start; margin-bottom: .65rem; font-size: .9rem; color: var(--color-text-muted); }
+.steps-list li::before { content: counter(steps); display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: rgba(74,222,128,.15); border: 1px solid rgba(74,222,128,.3); border-radius: 50%; color: var(--color-primary); font-size: .75rem; font-weight: 700; flex-shrink: 0; margin-top: .1rem; }
+.supplement-card { background: linear-gradient(135deg, rgba(249,115,22,.06), rgba(194,65,12,.03)); border: 1px solid rgba(249,115,22,.2); border-radius: var(--radius-card); padding: 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
+.supplement-img { width: 100px; height: 120px; object-fit: cover; border-radius: 10px; flex-shrink: 0; }
+.supplement-info { flex: 1; }
+.supplement-info h4 { font-size: .95rem; font-weight: 700; color: #fff; margin-bottom: .35rem; }
+.supplement-info p { font-size: .82rem; color: var(--color-text-muted); margin-bottom: .85rem; }
+
+/* LLM Panel */
+.llm-panel-outer { background: linear-gradient(135deg, rgba(74,222,128,.06), rgba(96,165,250,.03)); border: 1px solid rgba(74,222,128,.2); border-radius: var(--radius-card); padding: 1.5rem; }
+.llm-panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.llm-panel-title { display: flex; align-items: center; gap: .6rem; font-weight: 700; color: var(--color-primary); font-size: .95rem; }
+.llm-section { margin-bottom: 1rem; }
+.llm-section h4 { font-size: .8rem; text-transform: uppercase; letter-spacing: .1em; color: var(--color-text-muted); margin-bottom: .5rem; }
+.llm-section p { font-size: .9rem; color: var(--color-text); line-height: 1.7; }
+.llm-section ul { list-style: none; padding: 0; }
+.llm-section ul li { position: relative; padding-left: 1.3rem; margin-bottom: .4rem; font-size: .88rem; color: var(--color-text-muted); }
+.llm-section ul li::before { content: '▸'; position: absolute; left: 0; color: var(--color-primary); }
+.llm-loading { display: flex; align-items: center; gap: .75rem; color: var(--color-text-muted); font-size: .9rem; padding: 1rem; }
+.llm-severity { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+
+@media (max-width: 900px) {
+  .results-grid { grid-template-columns: 1fr; }
+  .supplement-card { flex-direction: column; text-align: center; }
+}
+</style>
+
+<section class="results-page">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="results-header fade-in-up">
+      <div class="badge badge-green" style="margin-bottom:.75rem;display:inline-flex;">
+        <i class="fa-solid fa-check-circle"></i> Analysis Complete
+      </div>
+      <h1>
+        {% if pred in [3,5,7,11,15,18,20,23,24,25,28,38] %}
+          <span>Healthy Plant</span> Detected 🌱
+        {% else %}
+          Detected: <span>{{ title }}</span>
+        {% endif %}
+      </h1>
+    </div>
+
+    <div class="results-grid">
+      <!-- Sidebar -->
+      <div class="sidebar fade-in-up delay-1">
+
+        <!-- Disease image -->
+        <div class="sidebar-img-card">
+          <img src="{{ image_url }}" alt="{{ title }}" loading="lazy">
+          <div class="sidebar-img-body">
+            <div style="font-weight:600;color:#fff;font-size:.9rem;">{{ title }}</div>
+            <div style="font-size:.78rem;color:var(--color-text-muted);margin-top:.25rem;">
+              Class index: {{ pred }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Confidence -->
+        <div class="confidence-section">
+          <div class="conf-label">Model Confidence</div>
+          <div class="conf-value">{{ confidence }}<span class="conf-pct">%</span></div>
+          <div class="conf-bar-wrap" style="margin-top:.75rem;">
+            <div class="progress-wrap">
+              <div class="progress-fill" id="confBar" data-val="{{ confidence }}"></div>
+            </div>
+          </div>
+          <div class="backend-badge">
+            {% if backend == 'triton' %}
+              <span class="badge badge-green"><i class="fa-solid fa-server"></i> Triton GPU</span>
+            {% else %}
+              <span class="badge badge-blue"><i class="fa-solid fa-microchip"></i> Local {{ 'GPU' if 'cuda' in backend else 'CPU' }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Back button -->
+        <a href="/index" class="btn btn-ghost" style="justify-content:center;">
+          <i class="fa-solid fa-arrow-left"></i> Analyse Another
+        </a>
+      </div>
+
+      <!-- Main content -->
+      <div class="content-col fade-in-up delay-2">
+
+        <!-- Description -->
+        <div class="info-card">
+          <h3>
+            <i class="fa-solid fa-circle-info"></i>
+            {% if pred in [3,5,7,11,15,18,20,23,24,25,28,38] %}
+              Tips to Grow Healthy Plants
+            {% else %}
+              Disease Overview
+            {% endif %}
+          </h3>
+          <p>{{ desc }}</p>
+        </div>
+
+        <!-- Prevention -->
+        <div class="info-card">
+          <h3>
+            <i class="fa-solid fa-shield"></i>
+            {% if pred in [3,5,7,11,15,18,20,23,24,25,28,38] %}
+              Benefits & Care Advice
+            {% else %}
+              Prevention & Treatment Steps
+            {% endif %}
+          </h3>
+          <p>{{ prevent }}</p>
+        </div>
+
+        <!-- LLM Explanation -->
+        <div class="llm-panel-outer" id="llmPanel">
+          <div class="llm-panel-header">
+            <div class="llm-panel-title">
+              <i class="fa-solid fa-robot"></i>
+              Claude AI Diagnosis
+            </div>
+            <span class="badge badge-blue"><i class="fa-solid fa-wand-magic-sparkles"></i> Generative AI</span>
+          </div>
+          <div id="llmContent">
+            <div class="llm-loading">
+              <div class="spinner"></div>
+              Generating AI diagnosis from Claude...
+            </div>
+          </div>
+        </div>
+
+        <!-- Supplement -->
+        {% if pred != 4 %}
+        <div class="info-card">
+          <h3>
+            <i class="fa-solid fa-flask"></i>
+            {% if pred in [3,5,7,11,15,18,20,23,24,25,28,38] %}
+              Recommended Fertilizer
+            {% else %}
+              Recommended Supplement
+            {% endif %}
+          </h3>
+          <div class="supplement-card">
+            <img src="{{ simage }}" alt="{{ sname }}" class="supplement-img" loading="lazy">
+            <div class="supplement-info">
+              <h4>{{ sname }}</h4>
+              <p>Recommended for this condition based on crop research data.</p>
+              <a href="{{ buy_link }}" target="_blank" rel="noopener" class="btn btn-accent">
+                <i class="fa-solid fa-cart-shopping"></i> Buy Product
+              </a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+      </div><!-- /content-col -->
+    </div><!-- /results-grid -->
+  </div>
+</section>
+
+{% endblock %}
+{% block scripts %}
+<script>
+// Animate confidence bar
+document.addEventListener('DOMContentLoaded', () => {
+  const bar = document.getElementById('confBar');
+  if (bar) {
+    const val = parseFloat(bar.dataset.val) || 0;
+    setTimeout(() => { bar.style.width = val + '%'; }, 300);
+    // Color the bar based on confidence
+    if (val >= 80) bar.style.background = 'var(--gradient-green)';
+    else if (val >= 50) bar.style.background = 'linear-gradient(135deg,#ca8a04,#fbbf24)';
+    else bar.style.background = 'linear-gradient(135deg,#c2410c,#f97316)';
+  }
+});
+
+// Fetch LLM explanation
+(async () => {
+  const diseaseClass = {{ disease_class | tojson }};
+  const panel = document.getElementById('llmContent');
+  try {
+    const res = await fetch('/explain', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ disease: diseaseClass })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    const severityColor = { high: 'badge-red', medium: 'badge-orange', low: 'badge-green', none: 'badge-green', unknown: 'badge-blue' };
+    const sev = (data.severity || 'unknown').toLowerCase();
+
+    panel.innerHTML = `
+      <div class="llm-severity" style="margin-bottom:1rem;">
+        <span class="badge ${severityColor[sev] || 'badge-blue'}">
+          <i class="fa-solid fa-triangle-exclamation"></i> Severity: ${data.severity || 'unknown'}
+        </span>
+        ${data.contagious ? '<span class="badge badge-orange"><i class="fa-solid fa-virus"></i> Contagious</span>' : ''}
+      </div>
+
+      <div class="llm-section">
+        <h4>Explanation</h4>
+        <p>${data.explanation}</p>
+      </div>
+
+      <div class="llm-section">
+        <h4>Treatment Steps</h4>
+        <ul>${(data.treatment_steps || []).map(s => `<li>${s}</li>`).join('')}</ul>
+      </div>
+
+      <div class="llm-section">
+        <h4>Preventive Measures</h4>
+        <ul>${(data.preventive_measures || []).map(s => `<li>${s}</li>`).join('')}</ul>
+      </div>
+
+      <div class="llm-section">
+        <h4>Recommended Fertilizers</h4>
+        <ul>${(data.fertilizers || []).map(s => `<li>${s}</li>`).join('')}</ul>
+      </div>
+
+      <div style="font-size:.72rem;color:var(--color-text-muted);margin-top:1rem;text-align:right;">
+        <i class="fa-solid fa-clock"></i> Generated ${new Date(data.generated_at).toLocaleString()}
+      </div>
+    `;
+  } catch(err) {
+    panel.innerHTML = `
+      <div class="alert alert-warn">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>AI diagnosis unavailable: ${err.message}. Please ensure ANTHROPIC_API_KEY is set.</span>
+      </div>`;
+  }
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block pagetitle %}{{ code }} — {{ message }}{% endblock %}
+{% block body %}
+<style>
+.error-page { min-height: calc(100vh - 64px); display: flex; align-items: center; justify-content: center; background: var(--gradient-hero); padding: 4rem 1rem; }
+.error-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: 24px; padding: 3rem 2.5rem; max-width: 520px; width: 100%; text-align: center; }
+.error-code { font-size: 5rem; font-weight: 900; background: var(--gradient-green); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: .5rem; }
+.error-title { font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 1rem; }
+.error-detail { font-size: .9rem; color: var(--color-text-muted); margin-bottom: 2rem; line-height: 1.6; }
+</style>
+<section class="error-page">
+  <div class="error-card fade-in-up">
+    <div class="error-code">{{ code }}</div>
+    <div class="error-title">{{ message }}</div>
+    <div class="error-detail">{{ detail }}</div>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="/" class="btn btn-ghost"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="/index" class="btn btn-primary"><i class="fa-solid fa-upload"></i> Try Again</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

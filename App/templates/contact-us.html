@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block pagetitle %}Contact Us{% endblock %}
+{% block body %}
+<style>
+.contact-page { padding: 5rem 0; min-height: calc(100vh - 64px); background: var(--gradient-hero); display: flex; align-items: center; }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+.contact-info h2 { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1rem; }
+.contact-item { display: flex; gap: .75rem; align-items: flex-start; margin-bottom: 1.5rem; }
+.contact-item-icon { width: 40px; height: 40px; background: rgba(74,222,128,.1); border: 1px solid rgba(74,222,128,.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--color-primary); flex-shrink: 0; }
+.contact-item-text .label { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--color-text-muted); }
+.contact-item-text .value { color: #fff; font-size: .9rem; font-weight: 500; margin-top: .1rem; }
+.contact-form-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: var(--radius-card); padding: 2rem; }
+.form-group { margin-bottom: 1.25rem; }
+.form-group label { display: block; font-size: .82rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: .4rem; letter-spacing: .04em; text-transform: uppercase; }
+.form-control {
+  width: 100%; padding: .7rem 1rem;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 10px; color: #fff; font-family: var(--font); font-size: .9rem;
+  outline: none; transition: border-color var(--transition), box-shadow var(--transition);
+}
+.form-control:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(74,222,128,.1); }
+.form-control::placeholder { color: var(--color-text-muted); }
+textarea.form-control { resize: vertical; min-height: 120px; }
+@media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; } }
+</style>
+
+<section class="contact-page">
+  <div class="container">
+    <div style="margin-bottom:3rem;" class="fade-in-up">
+      <div class="section-label">Get In Touch</div>
+      <h1 class="section-title">Contact <span>Us</span></h1>
+      <div class="divider"></div>
+      <p class="section-body">Have a question or want to report an issue? We'd love to hear from you.</p>
+    </div>
+
+    <div class="contact-grid">
+      <div class="fade-in-up delay-1">
+        <div class="contact-item">
+          <div class="contact-item-icon"><i class="fa-solid fa-envelope"></i></div>
+          <div class="contact-item-text">
+            <div class="label">Email</div>
+            <div class="value">contact@cultikure.ai</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon"><i class="fa-brands fa-github"></i></div>
+          <div class="contact-item-text">
+            <div class="label">GitHub</div>
+            <div class="value">github.com/Manu-krishnan005/CultiKure-Disease-Prediction</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon"><i class="fa-solid fa-shield-halved"></i></div>
+          <div class="contact-item-text">
+            <div class="label">Privacy</div>
+            <div class="value">Images are not stored permanently. We respect your data.</div>
+          </div>
+        </div>
+        <div style="margin-top:2rem;background:var(--color-glass);border:1px solid var(--color-glass-border);border-radius:var(--radius-card);padding:1.25rem;">
+          <div style="font-weight:600;color:#fff;margin-bottom:.5rem;"><i class="fa-solid fa-circle-info" style="color:var(--color-primary)"></i> About CultiKure</div>
+          <p style="font-size:.85rem;color:var(--color-text-muted);line-height:1.7;">
+            CultiKure is a research-grade plant disease detection system integrating VGG16 deep learning,
+            NVIDIA Triton Inference Server, and Anthropic Claude AI for comprehensive diagnosis and treatment advice.
+          </p>
+        </div>
+      </div>
+
+      <div class="contact-form-card fade-in-up delay-2">
+        <h2 style="font-size:1rem;font-weight:700;color:#fff;margin-bottom:1.5rem;">Send a Message</h2>
+        <form>
+          <div class="form-group">
+            <label for="contact-name">Name</label>
+            <input type="text" id="contact-name" class="form-control" placeholder="Your full name">
+          </div>
+          <div class="form-group">
+            <label for="contact-email">Email</label>
+            <input type="email" id="contact-email" class="form-control" placeholder="you@example.com">
+          </div>
+          <div class="form-group">
+            <label for="contact-subject">Subject</label>
+            <input type="text" id="contact-subject" class="form-control" placeholder="How can we help?">
+          </div>
+          <div class="form-group">
+            <label for="contact-message">Message</label>
+            <textarea id="contact-message" class="form-control" placeholder="Describe your question or issue..."></textarea>
+          </div>
+          <button type="button" class="btn btn-primary" style="width:100%;justify-content:center;" onclick="alert('Thank you! This is a demo form.')">
+            <i class="fa-solid fa-paper-plane"></i> Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

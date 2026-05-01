@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block pagetitle %}AI Engine{% endblock %}
+{% block body %}
+<style>
+.page-wrap { min-height: calc(100vh - 64px); display: flex; align-items: center; padding: 4rem 0; background: var(--gradient-hero); }
+.upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+.info-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: var(--radius-card); padding: 2rem; }
+.why-list { list-style: none; margin-top: 1rem; }
+.why-list li { display: flex; gap: .75rem; align-items: flex-start; margin-bottom: 1rem; font-size: .9rem; color: var(--color-text-muted); }
+.why-list li .icon { color: var(--color-primary); font-size: 1rem; margin-top: .1rem; flex-shrink: 0; }
+.upload-card { background: var(--color-glass); border: 1px solid var(--color-glass-border); border-radius: var(--radius-card); padding: 2rem; }
+.upload-zone {
+  border: 2px dashed rgba(74,222,128,.35); border-radius: 12px; padding: 2.5rem 1.5rem;
+  text-align: center; cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+  position: relative;
+}
+.upload-zone:hover, .upload-zone.drag-over { border-color: var(--color-primary); background: rgba(74,222,128,.04); }
+.upload-zone input[type=file] { display: none; }
+.upload-icon { font-size: 3rem; margin-bottom: 1rem; }
+.upload-cta { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: .4rem; }
+.upload-hint { font-size: .82rem; color: var(--color-text-muted); }
+.upload-preview { display: none; margin-top: 1.5rem; }
+.upload-preview img { max-height: 200px; border-radius: 10px; object-fit: cover; width: 100%; }
+.preview-name { font-size: .82rem; color: var(--color-text-muted); margin-top: .5rem; text-align: center; }
+.supported { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: 1rem; justify-content: center; }
+.tag { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 6px; padding: .2rem .55rem; font-size: .72rem; color: var(--color-text-muted); }
+.submit-btn-wrap { margin-top: 1.5rem; text-align: center; }
+.progress-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; gap: 1.5rem; }
+.progress-overlay.active { display: flex; }
+.progress-overlay .spinner { width: 56px; height: 56px; border-width: 4px; }
+.progress-label { color: #fff; font-size: 1.1rem; font-weight: 600; }
+.progress-sub { color: var(--color-text-muted); font-size: .85rem; }
+@media (max-width: 768px) { .upload-grid { grid-template-columns: 1fr; } }
+</style>
+
+<!-- Loading Overlay -->
+<div class="progress-overlay" id="loadingOverlay" role="dialog" aria-modal="true" aria-label="Analyzing image">
+  <div class="spinner"></div>
+  <div class="progress-label">🔬 Analysing your leaf...</div>
+  <div class="progress-sub">Running VGG inference via Triton Server</div>
+</div>
+
+<div class="page-wrap">
+  <div class="container">
+    <div style="text-align:center; margin-bottom:3rem;" class="fade-in-up">
+      <div class="section-label">AI Engine</div>
+      <h1 class="section-title">Detect <span>Plant Disease</span></h1>
+      <div class="divider" style="margin:1rem auto;"></div>
+      <p class="section-body" style="margin:0 auto;text-align:center;">
+        Upload a clear photo of a plant leaf. Our AI analyses it and delivers a diagnosis in seconds.
+      </p>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-error" role="alert" style="max-width:800px;margin:0 auto 2rem;">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <div class="upload-grid">
+      <!-- Info panel -->
+      <div class="info-card fade-in-up delay-1">
+        <h2 style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:.5rem;">
+          <i class="fa-solid fa-circle-question" style="color:var(--color-primary)"></i>
+          Why detect plant disease?
+        </h2>
+        <ul class="why-list">
+          <li><i class="fa-solid fa-check icon"></i> Early detection prevents crop losses of up to 40%</li>
+          <li><i class="fa-solid fa-check icon"></i> Reduces unnecessary pesticide use and farm costs</li>
+          <li><i class="fa-solid fa-check icon"></i> Tailored treatment prevents disease spread to neighbouring crops</li>
+          <li><i class="fa-solid fa-check icon"></i> AI diagnosis is available 24/7 — no agronomist needed</li>
+          <li><i class="fa-solid fa-check icon"></i> Supports 14+ crop types and 39 disease classes</li>
+        </ul>
+
+        <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--color-border);">
+          <div class="badge badge-green" style="margin-bottom:.75rem;"><i class="fa-solid fa-brain"></i> Powered by</div>
+          <div style="display:flex;flex-direction:column;gap:.5rem;font-size:.85rem;color:var(--color-text-muted);">
+            <div><i class="fa-solid fa-network-wired" style="color:var(--color-primary);width:18px;"></i> VGG16 deep neural network</div>
+            <div><i class="fa-solid fa-server" style="color:var(--color-primary);width:18px;"></i> NVIDIA Triton Inference Server</div>
+            <div><i class="fa-solid fa-robot" style="color:var(--color-primary);width:18px;"></i> Anthropic Claude AI diagnosis</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload panel -->
+      <div class="upload-card fade-in-up delay-2">
+        <h2 style="font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1.25rem;">
+          <i class="fa-solid fa-upload" style="color:var(--color-primary)"></i>
+          Upload Leaf Image
+        </h2>
+
+        <form action="/submit" method="POST" enctype="multipart/form-data" id="uploadForm">
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" id="actual-btn" name="image" accept=".jpg,.jpeg,.png,.webp,.bmp">
+            <label for="actual-btn" style="cursor:pointer;display:flex;flex-direction:column;align-items:center;background:transparent;padding:0;border-radius:0;margin:0;">
+              <div class="upload-icon">🌿</div>
+              <div class="upload-cta">Drag &amp; drop or click to upload</div>
+              <div class="upload-hint">High-quality leaf photos work best</div>
+              <div class="supported">
+                <span class="tag">JPG</span>
+                <span class="tag">JPEG</span>
+                <span class="tag">PNG</span>
+                <span class="tag">WebP</span>
+                <span class="tag">BMP</span>
+              </div>
+            </label>
+          </div>
+
+          <div class="upload-preview" id="previewBox">
+            <img src="" alt="Preview" id="previewImg">
+            <div class="preview-name" id="previewName"></div>
+          </div>
+
+          <div class="submit-btn-wrap">
+            <button type="submit" class="btn btn-primary btn-lg" id="submit-btn" disabled>
+              <i class="fa-solid fa-microscope"></i> Analyse Disease
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+const zone    = document.getElementById('uploadZone');
+const input   = document.getElementById('actual-btn');
+const preview = document.getElementById('previewBox');
+const previewImg  = document.getElementById('previewImg');
+const previewName = document.getElementById('previewName');
+const submitBtn   = document.getElementById('submit-btn');
+const form        = document.getElementById('uploadForm');
+const overlay     = document.getElementById('loadingOverlay');
+
+function handleFile(file) {
+  if (!file) return;
+  previewImg.src = URL.createObjectURL(file);
+  previewName.textContent = file.name;
+  preview.style.display = 'block';
+  submitBtn.disabled = false;
+  submitBtn.classList.add('pulse-glow');
+}
+
+input.addEventListener('change', () => handleFile(input.files[0]));
+
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) { input.files = e.dataTransfer.files; handleFile(file); }
+});
+
+form.addEventListener('submit', () => {
+  overlay.classList.add('active');
+});
+</script>
+{% endblock %}

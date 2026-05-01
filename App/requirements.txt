@@ -1,0 +1,33 @@
+# ─────────────────────────────────────────────────────────────
+# CultiKure — Flask Application Requirements
+# Generated: 2026-04-30
+# ─────────────────────────────────────────────────────────────
+
+# Web Framework
+flask==3.1.0
+gunicorn==23.0.0
+
+# Image Processing
+Pillow==10.4.0
+
+# Scientific Computing
+numpy==1.26.4
+pandas==2.2.3
+
+# Deep Learning (CPU build; for GPU use torch+cu118 below)
+torch==2.3.1
+torchvision==0.18.1
+# For GPU: pip install torch==2.3.1+cu118 torchvision==0.18.1+cu118 -f https://download.pytorch.org/whl/torch_stable.html
+
+# ONNX Runtime (CPU; for GPU use onnxruntime-gpu)
+onnxruntime==1.18.1
+# For GPU: onnxruntime-gpu==1.18.1
+
+# Triton Client (HTTP REST)
+tritonclient[http]==2.48.0
+
+# Anthropic Claude API
+anthropic==0.32.0
+
+# Utilities
+python-dotenv==1.0.1

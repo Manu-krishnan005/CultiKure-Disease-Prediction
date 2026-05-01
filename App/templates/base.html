@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CultiKure — AI-powered plant disease detection.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <title>{% block pagetitle %}CultiKure{% endblock %} | CultiKure</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<nav class="navbar" role="navigation">
+  <a href="/" class="navbar-brand" aria-label="CultiKure Home">
+    <div class="brand-icon"><i class="fa-solid fa-leaf"></i></div>
+    CultiKure
+  </a>
+  <ul class="navbar-nav" role="list">
+    <li><a class="nav-link" href="/">Home</a></li>
+    <li><a class="nav-link" href="/market">Supplements</a></li>
+    <li><a class="nav-link" href="/contact">Contact</a></li>
+    <li><a class="btn nav-cta" href="/index" id="nav-aiengine-btn">
+      <i class="fa-solid fa-microscope"></i>
+      <span class="hide-mobile">AI Engine</span>
+    </a></li>
+  </ul>
+</nav>
+<main>{% block body %}{% endblock %}</main>
+<footer role="contentinfo">
+  <div class="container footer-inner">
+    <div><strong style="color:var(--color-primary)">CultiKure</strong> &nbsp;·&nbsp; AI Plant Disease Detection</div>
+    <nav class="footer-links">
+      <a href="/">Home</a>
+      <a href="/index">AI Engine</a>
+      <a href="/market">Supplements</a>
+      <a href="/contact">Contact</a>
+    </nav>
+    <div style="color:var(--color-text-muted)">Powered by VGG16 · Triton · Claude AI</div>
+  </div>
+</footer>
+<script>
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === window.location.pathname) l.classList.add('active');
+  });
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

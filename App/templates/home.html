@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+{% block pagetitle %}Plant Disease Detection{% endblock %}
+{% block body %}
+
+<style>
+/* ── Hero ────────────────────────────────────────────────────────── */
+.hero {
+  min-height: calc(100vh - 64px);
+  background: var(--gradient-hero);
+  display: flex; align-items: center;
+  position: relative; overflow: hidden;
+  padding: 4rem 0;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 60% 40%, rgba(74,222,128,.08), transparent 70%);
+  pointer-events: none;
+}
+.hero-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 4rem; align-items: center;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(74,222,128,.12); border: 1px solid rgba(74,222,128,.25);
+  padding: .35rem .85rem; border-radius: var(--radius-pill);
+  font-size: .78rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--color-primary);
+  margin-bottom: 1.25rem;
+}
+.hero h1 {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 800; line-height: 1.1;
+  color: #fff; margin-bottom: 1.25rem;
+}
+.hero h1 span {
+  background: var(--gradient-green);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-body {
+  color: var(--color-text-muted); font-size: 1.05rem;
+  line-height: 1.7; margin-bottom: 2rem;
+}
+.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+.hero-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1rem; margin-top: 3rem;
+}
+.stat-card {
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: 12px; padding: 1rem;
+  text-align: center;
+}
+.stat-num { font-size: 1.8rem; font-weight: 800; color: var(--color-primary); display: block; }
+.stat-lbl { font-size: .75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .08em; }
+
+/* Hero visual */
+.hero-visual {
+  position: relative; display: flex; align-items: center; justify-content: center;
+}
+.hero-orb {
+  width: 380px; height: 380px;
+  background: radial-gradient(circle at 40% 40%, rgba(74,222,128,.18), rgba(22,163,74,.06) 50%, transparent 70%);
+  border-radius: 50%;
+  border: 1px solid rgba(74,222,128,.12);
+  display: flex; align-items: center; justify-content: center;
+  animation: hero-float 6s ease-in-out infinite;
+}
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-16px); }
+}
+.hero-orb-inner {
+  font-size: 8rem; filter: drop-shadow(0 0 40px rgba(74,222,128,.5));
+}
+.hero-badge {
+  position: absolute; bottom: 40px; right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-glass-border);
+  border-radius: 12px; padding: .9rem 1.2rem;
+  display: flex; align-items: center; gap: .75rem;
+  box-shadow: var(--shadow-card);
+  animation: badge-float 4s ease-in-out infinite;
+}
+@keyframes badge-float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50%       { transform: translateY(-8px) translateX(3px); }
+}
+.hero-badge-icon { font-size: 1.4rem; }
+.hero-badge-label { font-size: .72rem; color: var(--color-text-muted); }
+.hero-badge-value { font-size: 1rem; font-weight: 700; color: #fff; }
+
+/* ── Features section ─────────────────────────────── */
+.features { padding: 6rem 0; }
+.feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3rem; }
+.feat-card {
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--radius-card); padding: 1.75rem;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+.feat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card);
+  border-color: rgba(74,222,128,.3);
+}
+.feat-icon {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, rgba(74,222,128,.15), rgba(22,163,74,.08));
+  border: 1px solid rgba(74,222,128,.2);
+  border-radius: 12px; font-size: 1.5rem;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1.25rem;
+}
+.feat-title { font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: .5rem; }
+.feat-body  { font-size: .88rem; color: var(--color-text-muted); line-height: 1.6; }
+
+/* ── Pipeline section ─────────────────────────────── */
+.pipeline { padding: 5rem 0; background: var(--color-surface); }
+.pipeline-steps { display: flex; align-items: flex-start; gap: 0; margin-top: 3rem; flex-wrap: wrap; }
+.pipeline-step { flex: 1; min-width: 180px; text-align: center; position: relative; padding: 1.5rem 1rem; }
+.pipeline-step:not(:last-child)::after {
+  content: '';
+  position: absolute; top: 38px; right: -4%;
+  width: 8%; height: 2px;
+  background: linear-gradient(to right, var(--color-primary-dark), transparent);
+}
+.step-num {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--gradient-green); color: #000;
+  font-weight: 800; font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1rem;
+  box-shadow: 0 0 20px rgba(74,222,128,.3);
+}
+.step-lbl { font-weight: 600; color: #fff; font-size: .9rem; }
+.step-desc { font-size: .78rem; color: var(--color-text-muted); margin-top: .35rem; }
+
+/* ── CTA section ──────────────────────────────────── */
+.cta-section {
+  padding: 6rem 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(74,222,128,.06), transparent 70%);
+  text-align: center;
+}
+.cta-card {
+  background: var(--color-glass);
+  border: 1px solid rgba(74,222,128,.2);
+  border-radius: 24px; padding: 3.5rem 2rem;
+  max-width: 700px; margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: 1fr; text-align: center; }
+  .hero-actions { justify-content: center; }
+  .hero-stats { grid-template-columns: repeat(3, 1fr); }
+  .hero-visual { display: none; }
+  .feat-grid { grid-template-columns: 1fr; }
+  .pipeline-step::after { display: none; }
+}
+</style>
+
+<!-- ── Hero ─────────────────────────────────────────────────────────── -->
+<section class="hero" aria-label="Hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="fade-in-up">
+        <div class="hero-eyebrow">
+          <i class="fa-solid fa-microchip"></i>
+          AI-Powered Detection
+        </div>
+        <h1>Detect <span>Plant Diseases</span> Instantly</h1>
+        <p class="hero-body">
+          Upload a leaf image and get instant disease detection powered by a deep-learning VGG16 model,
+          served via NVIDIA Triton Inference Server, with LLM-generated treatment advice from Claude AI.
+        </p>
+        <div class="hero-actions">
+          <a href="/index" class="btn btn-primary btn-lg pulse-glow" id="hero-start-btn">
+            <i class="fa-solid fa-upload"></i> Analyse a Leaf
+          </a>
+          <a href="/market" class="btn btn-ghost btn-lg" id="hero-market-btn">
+            <i class="fa-solid fa-store"></i> Browse Supplements
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-card fade-in-up delay-1">
+            <span class="stat-num">39</span>
+            <span class="stat-lbl">Disease Classes</span>
+          </div>
+          <div class="stat-card fade-in-up delay-2">
+            <span class="stat-num">&lt;100ms</span>
+            <span class="stat-lbl">GPU Inference</span>
+          </div>
+          <div class="stat-card fade-in-up delay-3">
+            <span class="stat-num">14+</span>
+            <span class="stat-lbl">Crop Types</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual fade-in-up delay-2" aria-hidden="true">
+        <div class="hero-orb">
+          <div class="hero-orb-inner">🌿</div>
+        </div>
+        <div class="hero-badge">
+          <div class="hero-badge-icon">🤖</div>
+          <div>
+            <div class="hero-badge-label">LLM Diagnosis</div>
+            <div class="hero-badge-value">Claude AI</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ──────────────────────────────────────────────────────── -->
+<section class="features" aria-label="Features">
+  <div class="container">
+    <div class="section-label">What We Offer</div>
+    <h2 class="section-title">End-to-End <span>AI Pipeline</span></h2>
+    <div class="divider"></div>
+    <p class="section-body">
+      From raw leaf image to actionable treatment advice — fully automated, GPU-accelerated, and containerised.
+    </p>
+
+    <div class="feat-grid">
+      <div class="feat-card fade-in-up">
+        <div class="feat-icon">🔬</div>
+        <div class="feat-title">VGG16 Deep Learning</div>
+        <div class="feat-body">Fine-tuned VGG16 on PlantVillage dataset — 39 classes, 224×224 input, ImageNet normalization.</div>
+      </div>
+      <div class="feat-card fade-in-up delay-1">
+        <div class="feat-icon">⚡</div>
+        <div class="feat-title">NVIDIA Triton Server</div>
+        <div class="feat-body">ONNX Runtime backend with CUDA execution provider for sub-100ms GPU inference at scale.</div>
+      </div>
+      <div class="feat-card fade-in-up delay-2">
+        <div class="feat-icon">🤖</div>
+        <div class="feat-title">Claude AI Diagnosis</div>
+        <div class="feat-body">Anthropic Claude generates plain-language explanations, treatment steps, and fertilizer advice.</div>
+      </div>
+      <div class="feat-card fade-in-up delay-1">
+        <div class="feat-icon">🐳</div>
+        <div class="feat-title">Docker Deployment</div>
+        <div class="feat-body">One-command <code>docker-compose up</code> launches Flask + Triton with GPU passthrough.</div>
+      </div>
+      <div class="feat-card fade-in-up delay-2">
+        <div class="feat-icon">📊</div>
+        <div class="feat-title">Confidence Scores</div>
+        <div class="feat-body">Every prediction includes a softmax confidence score displayed as a visual gauge.</div>
+      </div>
+      <div class="feat-card fade-in-up delay-3">
+        <div class="feat-icon">🛒</div>
+        <div class="feat-title">Supplement Market</div>
+        <div class="feat-body">Direct links to buy disease-specific fertilizers and treatments with one click.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Pipeline ───────────────────────────────────────────────────────── -->
+<section class="pipeline" aria-label="How it works">
+  <div class="container">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">The <span>Inference Pipeline</span></h2>
+    <div class="divider"></div>
+    <div class="pipeline-steps">
+      <div class="pipeline-step fade-in-up">
+        <div class="step-num">1</div>
+        <div class="step-lbl">Upload Image</div>
+        <div class="step-desc">JPG / PNG leaf photo via drag &amp; drop</div>
+      </div>
+      <div class="pipeline-step fade-in-up delay-1">
+        <div class="step-num">2</div>
+        <div class="step-lbl">Pre-process</div>
+        <div class="step-desc">Resize 224×224, ImageNet normalise</div>
+      </div>
+      <div class="pipeline-step fade-in-up delay-2">
+        <div class="step-num">3</div>
+        <div class="step-lbl">Triton Infer</div>
+        <div class="step-desc">VGG ONNX model, CUDA GPU</div>
+      </div>
+      <div class="pipeline-step fade-in-up delay-3">
+        <div class="step-num">4</div>
+        <div class="step-lbl">Claude LLM</div>
+        <div class="step-desc">AI explanation &amp; treatment plan</div>
+      </div>
+      <div class="pipeline-step fade-in-up delay-4">
+        <div class="step-num">5</div>
+        <div class="step-lbl">Results</div>
+        <div class="step-desc">Confidence, diagnosis, supplement</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ────────────────────────────────────────────────────────────── -->
+<section class="cta-section" aria-label="Call to action">
+  <div class="container">
+    <div class="cta-card fade-in-up">
+      <div style="font-size:3rem;margin-bottom:1rem;">🌱</div>
+      <h2 class="section-title" style="margin-bottom:1rem">
+        Ready to <span>diagnose</span> your plant?
+      </h2>
+      <p style="color:var(--color-text-muted);margin-bottom:2rem;font-size:1rem;">
+        Upload a leaf photo and get AI-powered disease detection with treatment advice in seconds.
+      </p>
+      <a href="/index" class="btn btn-primary btn-lg" id="cta-main-btn">
+        <i class="fa-solid fa-leaf"></i> Start Free Analysis
+      </a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
