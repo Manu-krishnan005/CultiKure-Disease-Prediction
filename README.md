@@ -28,11 +28,6 @@ cp .env.example .env
 
 # Deploy
 docker-compose up --build
-```
-
-Open http://localhost:5000
-
----
 
 ## Architecture
 
@@ -125,8 +120,4 @@ CultiKure/
 └── .env.example           # Environment template
 ```
 
----
 
-## License
-
-MIT License — see LICENSE file.
